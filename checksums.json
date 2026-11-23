@@ -1,0 +1,78 @@
+{
+  ".github/workflows/pwa-check.yml": {
+    "bytes": 320,
+    "sha256": "0fc4e6bf9e57f9d3214730c59108a046f2089a66d805ef784227e694a7187f25"
+  },
+  ".nojekyll": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "404.html": {
+    "bytes": 163,
+    "sha256": "569589a548dcb2a70dbee92497d012702afe2975186987ab0b861fbab65a5eb0"
+  },
+  "CNAME.example": {
+    "bytes": 193,
+    "sha256": "1aeee23212fe10a95e829703fd0fe32223ee74cd6bae7c3af22a96f367fe483c"
+  },
+  "README.md": {
+    "bytes": 1197,
+    "sha256": "0e22383bda9b5547aaca2f993ac6fb6abc89d7f62d2d2418f38ac08e2d601adf"
+  },
+  "icons/icon-180.png": {
+    "bytes": 25680,
+    "sha256": "0e3038d6ed29da3f4c558e658bb2d44e177a2419334cb9589b75a015d4c93e9e"
+  },
+  "icons/icon-192.png": {
+    "bytes": 28966,
+    "sha256": "0baa8ac4fadf27aecc7f6d65d835d4a90681171cbf4247626175fc9f30f43f32"
+  },
+  "icons/icon-512-maskable.png": {
+    "bytes": 93837,
+    "sha256": "38127be131c02604f889eab7a66a425e5a927b24baecc59550139d687fb2fac5"
+  },
+  "icons/icon-512.png": {
+    "bytes": 164829,
+    "sha256": "08897e6525b39a8fac42fc6d165d50d0d5c2c714ad4dd7f9fe227d8ab5db25e5"
+  },
+  "icons/icon.svg": {
+    "bytes": 352,
+    "sha256": "33d55f7bf357ee30dbde1afd1292e179fae67711a42710b826c5feab0db3e9c4"
+  },
+  "index.html": {
+    "bytes": 19363,
+    "sha256": "c3a10aafb67403e98ca03083e433497f890b6b9569b87c0a5fe47c368c761ab8"
+  },
+  "manifest.json": {
+    "bytes": 822,
+    "sha256": "bc09096f122e35fedd9d6b7abe8cabe11cdc0880e3d4d91ef232306e150020c2"
+  },
+  "scripts/check_pwa.py": {
+    "bytes": 5801,
+    "sha256": "6b530da8b2fd18872e457d1bfe034538faa4bbf2bbca65cd2aaceafb578c1340"
+  },
+  "sw.js": {
+    "bytes": 1943,
+    "sha256": "d672357a810bda87d4a4cc2384754d641adb5bdb0e9dca03c46cf09380359d6a"
+  },
+  "videos/01.mp4": {
+    "bytes": 6501153,
+    "sha256": "5d193aa22ec1cab55b241cf19cd16568251616c2ca8fbe260bccd4e151b5d4d8"
+  },
+  "videos/02.mp4": {
+    "bytes": 6063623,
+    "sha256": "2db632621aeea19e84f0412eb6d7101edb7b1f73dc4176043320c0ba5e125568"
+  },
+  "videos/03.mp4": {
+    "bytes": 5293789,
+    "sha256": "b5d54e9568a36d23eeca5e492fccc0cf7ba007d9eb2983107685bac99c2a047a"
+  },
+  "videos/04.mp4": {
+    "bytes": 5657837,
+    "sha256": "02a7edbf42ea55da52fbcbfbbc56c8eb4bbbe2f1978f31412c2302e51dd4953b"
+  },
+  "videos/05.mp4": {
+    "bytes": 6148602,
+    "sha256": "d64a78a117dd9e37302475470a193bb14e2d444f1ee6311d70b1e66b5c6f2d84"
+  }
+}

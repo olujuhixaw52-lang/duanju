@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="创世录短剧">
+  <rect width="512" height="512" rx="104" fill="#0A0A0C"/>
+  <rect x="24" y="24" width="464" height="464" rx="84" fill="none" stroke="#FF4757" stroke-opacity="0.28" stroke-width="3"/>
+  <path d="M210 168 L360 256 L210 344 Z" fill="#FF4757"/>
+</svg>

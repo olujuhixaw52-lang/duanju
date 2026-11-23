@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="创世录短剧">
+<meta name="description" content="竖屏沉浸式短剧播放器：上滑切集、选集抽屉、倍速、离线缓存外壳，可添加到手机桌面。">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<title>创世录短剧 · 竖屏剧场</title>
+<style>
+:root{
+  --ink:#0A0A0C; --panel:#141416; --line:rgba(255,255,255,.10);
+  --text:#F3F3F5; --muted:#9A9AA1; --accent:#FF4757;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+  --tap:44px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100vw;max-width:100vw;background:var(--ink);color:var(--text);overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif}
+#app{position:relative;width:100vw;max-width:480px;height:100dvh;height:100vh;margin:0 auto;background:#000;overflow:hidden;isolation:isolate}
+
+video#player{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;z-index:1}
+
+/* 顶部 */
+.top-bar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(12px + var(--safe-top)) 16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,0))}
+.tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,71,87,.92);color:#fff;
+  padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.4px}
+.speed{min-height:var(--tap);min-width:96px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
+  background:rgba(255,255,255,.16);backdrop-filter:blur(10px);color:var(--text);font-size:14px;font-weight:600;cursor:pointer}
+.speed:active{background:rgba(255,255,255,.26)}
+.speed:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 右侧操作栏：避开平台 UI，贴右下 */
+.side{position:absolute;right:16px;bottom:calc(190px + var(--safe-bottom));z-index:10;display:flex;flex-direction:column;gap:18px;align-items:center;width:56px}
+.act{display:flex;flex-direction:column;align-items:center;gap:6px;width:56px;background:none;border:0;color:inherit;cursor:pointer;padding:0}
+.act .ico{width:var(--tap);height:var(--tap);border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.16);font-size:19px}
+.act:active .ico{transform:scale(.94)}
+.act:focus-visible .ico{outline:2px solid var(--accent);outline-offset:3px}
+.act .lb{font-size:12px;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.act[aria-pressed="true"] .ico{background:rgba(255,71,87,.28);border-color:rgba(255,71,87,.6);color:#FFD9DC}
+
+/* 底部信息 */
+.info{position:absolute;left:0;right:0;bottom:0;z-index:10;padding:22px 16px calc(18px + var(--safe-bottom));
+  background:linear-gradient(to top,rgba(0,0,0,.92),rgba(0,0,0,.45) 60%,rgba(0,0,0,0))}
+.ep-title{font-size:17px;font-weight:700;line-height:1.4;padding-right:72px;margin-bottom:6px}
+.ep-desc{font-size:14px;line-height:1.5;color:var(--muted);padding-right:72px;margin-bottom:14px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.selector{width:100%;min-height:var(--tap);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:0 14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer}
+.selector:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#selectorLabel{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selector > span:last-child{flex:none}
+.act .lb{white-space:nowrap}
+
+/* 进度条 */
+.progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.16);z-index:11}
+.progress > i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s linear}
+
+/* 选集抽屉 */
+.mask{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:20;opacity:0;pointer-events:none;transition:opacity .22s}
+.drawer{position:absolute;left:0;right:0;bottom:0;z-index:21;background:var(--panel);border-top:1px solid var(--line);
+  border-radius:20px 20px 0 0;padding:18px 18px calc(24px + var(--safe-bottom));
+  transform:translateY(102%);transition:transform .3s cubic-bezier(.22,1,.36,1);max-height:70dvh;display:flex;flex-direction:column}
+.drawer.open{transform:translateY(0)}
+.mask.show{opacity:1;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){.drawer,.mask,.progress > i{transition:none}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.drawer-head h2{font-size:16px;font-weight:700}
+.drawer-head .close{width:var(--tap);height:var(--tap);border:1px solid var(--line);border-radius:12px;background:none;
+  color:var(--muted);font-size:18px;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;overflow-y:auto;overscroll-behavior:contain}
+.ep{min-height:var(--tap);background:#1E1E21;border:1px solid transparent;border-radius:10px;color:var(--text);
+  font-size:14px;font-weight:600;cursor:pointer;padding:10px 4px;line-height:1.3}
+.ep small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+.ep[aria-current="true"]{background:rgba(255,71,87,.16);border-color:rgba(255,71,87,.6);color:#FFD9DC}
+.ep:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 状态层 */
+.status{position:absolute;inset:0;z-index:30;display:none;place-items:center;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);text-align:center;padding:24px}
+.status.show{display:grid}
+.status p{font-size:14px;color:var(--muted);margin-top:8px;max-width:280px}
+.status .big{font-size:15px;color:var(--text);font-weight:600}
+.btn{min-height:var(--tap);margin-top:18px;padding:0 22px;border-radius:999px;border:1px solid var(--line);
+  background:rgba(255,255,255,.14);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.swipe-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(28px);z-index:9;
+  font-size:13px;color:rgba(255,255,255,.55);opacity:0;transition:opacity .4s;pointer-events:none}
+.swipe-hint.show{opacity:1}
+</style>
+</head>
+<body>
+<main id="app" aria-label="竖屏短剧播放器">
+
+  <video id="player" playsinline webkit-playsinline loop preload="auto" muted poster=""
+         aria-label="剧集画面"></video>
+
+  <div class="top-bar">
+    <span class="tag" id="tag">🔥 剧场</span>
+    <button class="speed" id="speedBtn" type="button" aria-label="切换播放速度">1.0x 倍速</button>
+  </div>
+
+  <div class="side">
+    <button class="act" id="likeBtn" type="button" aria-pressed="false" aria-label="点赞本集">
+      <span class="ico" aria-hidden="true">♥</span><span class="lb" id="likeCount">—</span>
+    </button>
+    <button class="act" id="drawerBtn" type="button" aria-haspopup="dialog" aria-label="打开选集">
+      <span class="ico" aria-hidden="true">☰</span><span class="lb">选集</span>
+    </button>
+    <button class="act" id="muteBtn" type="button" aria-pressed="true" aria-label="切换声音">
+      <span class="ico" aria-hidden="true">🔇</span><span class="lb" id="muteLabel">点开声音</span>
+    </button>
+  </div>
+
+  <div class="info">
+    <h1 class="ep-title" id="epTitle">加载中…</h1>
+    <p class="ep-desc" id="epDesc">点击画面暂停 / 继续 · 上滑或下滑切换剧集</p>
+    <button class="selector" id="selectorBtn" type="button" aria-haspopup="dialog">
+      <span id="selectorLabel">选集</span><span aria-hidden="true">▸</span>
+    </button>
+  </div>
+
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+  <div class="mask" id="mask"></div>
+  <section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-head">
+      <h2 id="drawerTitle">选择剧集</h2>
+      <button class="close" id="closeBtn" type="button" aria-label="关闭选集">✕</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="status" id="status" role="status" aria-live="polite">
+    <div>
+      <div class="big" id="statusTitle">正在加载…</div>
+      <p id="statusText">首次播放需要几秒缓冲，之后会更快。</p>
+      <button class="btn primary" id="retryBtn" type="button">重新加载</button>
+    </div>
+  </div>
+
+  <div class="swipe-hint" id="hint">上滑看下一集</div>
+</main>
+
+<script>
+/* ============================================================
+   1) 剧集配置：只改这一段就能换成自己的片源
+   ------------------------------------------------------------
+   title / desc / likes 随便写；videoUrl 支持：
+     · 相对路径（放在 web/drama 同站可访问的位置）
+     · http(s) 直链 mp4
+     · 同一集准备多条镜像时用 mirrors 数组，主源失败自动降级
+   ============================================================ */
+const dramaList = [
+  {
+    "episode": 1,
+    "title": "第1集：成片 · 落日海滩与户外电源",
+    "desc": "9:16 竖屏成片，BGM 与旁白已合轨。",
+    "likes": "1.2w",
+    "videoUrl": "videos/01.mp4",
+    "mirrors": []
+  },
+  {
+    "episode": 2,
+    "title": "第2集：导演剪辑版 · 带 BGM",
+    "desc": "同一素材的另一种剪法，节奏更慢。",
+    "likes": "8540",
+    "videoUrl": "videos/02.mp4",
+    "mirrors": []
+  },
+  {
+    "episode": 3,
+    "title": "第3集：音效版",
+    "desc": "加了关键动作音效，适合投放 A/B 对比。",
+    "likes": "2.4w",
+    "videoUrl": "videos/03.mp4",
+    "mirrors": []
+  },
+  {
+    "episode": 4,
+    "title": "第4集：旁白版",
+    "desc": "全程旁白铺满，适合不带字幕的平台。",
+    "likes": "6731",
+    "videoUrl": "videos/04.mp4",
+    "mirrors": []
+  },
+  {
+    "episode": 5,
+    "title": "第5集：竖版轻量版",
+    "desc": "体积更小，弱网环境优先用它。",
+    "likes": "4128",
+    "videoUrl": "videos/05.mp4",
+    "mirrors": []
+  }
+];
+
+/* 播放速度档位 */
+const SPEEDS = [1.0, 1.25, 1.5, 2.0];
+/* 卡顿判定：连续 9 秒进度不动且未暂停，判为卡住 */
+const STALL_MS = 9000;
+
+const $ = (id) => document.getElementById(id);
+const player = $("player");
+const status = $("status");
+const statusTitle = $("statusTitle");
+const statusText = $("statusText");
+const bar = $("bar");
+const hint = $("hint");
+
+let idx = 0;
+let speedIdx = 0;
+let retries = 0;
+let lastProgressAt = Date.now();
+let lastTime = 0;
+let stallTimer = 0;
+let preloader = null;
+let drawerOpen = false;
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("drama:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("drama:" + k, JSON.stringify(v)); } catch {} }
+};
+
+function current() { return dramaList[idx]; }
+function sources(item) { return [item.videoUrl].concat(item.mirrors || []).filter(Boolean); }
+
+/* ---------- 播放 ---------- */
+function setStatus(title, text, withButton) {
+  statusTitle.textContent = title;
+  statusText.textContent = text || "";
+  $("retryBtn").hidden = !withButton;
+  status.classList.add("show");
+}
+function clearStatus() { status.classList.remove("show"); }
+
+function loadEpisode(i, opts) {
+  const o = opts || {};
+  idx = ((i % dramaList.length) + dramaList.length) % dramaList.length;
+  const item = current();
+  retries = 0;
+  clearStatus();
+
+  const list = sources(item);
+  player.src = list[0];
+  player.load();
+  player.playbackRate = SPEEDS[speedIdx];
+
+  $("epTitle").textContent = item.title;
+  $("epDesc").textContent = item.desc;
+  $("likeCount").textContent = item.likes || "—";
+  $("likeBtn").setAttribute("aria-pressed", String(!!store.get("like:" + item.episode, false)));
+  $("selectorLabel").textContent = "共 " + dramaList.length + " 集 · 第 " + item.episode + " 集";
+  document.title = item.title + " · 创世录短剧";
+
+  renderGrid();
+  bar.style.width = "0%";
+  lastTime = 0;
+  lastProgressAt = Date.now();
+
+  if (!o.keepMuted) {
+    // 首屏静音自播，用户一点即出声；再次切集沿用当前声音状态
+  }
+  player.play().catch(() => { /* 浏览器策略拦下时等用户点击 */ });
+  preloadNext();
+}
+
+function playSafely() { player.play().catch(() => {}); }
+
+/* 预取下一集首帧，切集时直接有画面 */
+function preloadNext() {
+  if (preloader) { preloader.removeAttribute("src"); preloader.load(); preloader.remove(); preloader = null; }
+  const next = dramaList[(idx + 1) % dramaList.length];
+  const src = sources(next)[0];
+  if (!src) return;
+  preloader = document.createElement("video");
+  preloader.preload = "metadata";
+  preloader.muted = true;
+  preloader.playsInline = true;
+  preloader.src = src;
+  preloader.style.display = "none";
+  document.body.appendChild(preloader);
+}
+
+/* 错误 / 卡顿 → 换镜像 → 重试 → 提示 */
+function fail(reason) {
+  const item = current();
+  const list = sources(item);
+  if (retries < list.length - 1) {
+    retries += 1;
+    player.src = list[retries];
+    player.load();
+    playSafely();
+    return;
+  }
+  if (retries < 2) {
+    retries += 1;
+    setTimeout(() => { player.load(); playSafely(); }, 1200);
+    return;
+  }
+  setStatus("这一集暂时播不出来", (reason || "片源无响应") + "。可以重试，或先看下一集。", true);
+}
+
+player.addEventListener("error", () => fail("片源地址无效或网络中断"));
+player.addEventListener("stalled", () => { /* 交给看门狗，避免误报 */ });
+player.addEventListener("timeupdate", () => {
+  if (player.duration) bar.style.width = (player.currentTime / player.duration * 100) + "%";
+  if (player.currentTime > lastTime + 0.05) { lastTime = player.currentTime; lastProgressAt = Date.now(); }
+});
+player.addEventListener("playing", () => { lastProgressAt = Date.now(); clearStatus(); });
+player.addEventListener("canplay", () => clearStatus());
+player.addEventListener("waiting", () => {
+  if (Date.now() - lastProgressAt > 3000) setStatus("正在缓冲…", "网络较慢，稍等几秒。", false);
+});
+
+stallTimer = setInterval(() => {
+  if (player.paused || !player.src) return;
+  if (Date.now() - lastProgressAt > STALL_MS) { lastProgressAt = Date.now(); fail("播放卡住了"); }
+}, 1500);
+
+/* ---------- 控件 ---------- */
+$("speedBtn").addEventListener("click", () => {
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  player.playbackRate = SPEEDS[speedIdx];
+  $("speedBtn").textContent = SPEEDS[speedIdx].toFixed(2).replace(/0$/, "") + "x 倍速";
+});
+
+$("muteBtn").addEventListener("click", () => {
+  player.muted = !player.muted;
+  $("muteBtn").setAttribute("aria-pressed", String(player.muted));
+  $("muteBtn").querySelector(".ico").textContent = player.muted ? "🔇" : "🔊";
+  $("muteLabel").textContent = player.muted ? "点开声音" : "声音已开";
+  if (!player.muted) playSafely();
+});
+
+$("likeBtn").addEventListener("click", () => {
+  const on = !(store.get("like:" + current().episode, false));
+  store.set("like:" + current().episode, on);
+  $("likeBtn").setAttribute("aria-pressed", String(on));
+});
+
+$("retryBtn").addEventListener("click", () => { retries = 0; loadEpisode(idx); });
+
+function openDrawer() {
+  drawerOpen = true;
+  $("mask").classList.add("show");
+  $("drawer").classList.add("open");
+  $("closeBtn").focus();
+}
+function closeDrawer() {
+  drawerOpen = false;
+  $("mask").classList.remove("show");
+  $("drawer").classList.remove("open");
+  $("selectorBtn").focus();
+}
+$("drawerBtn").addEventListener("click", openDrawer);
+$("selectorBtn").addEventListener("click", openDrawer);
+$("closeBtn").addEventListener("click", closeDrawer);
+$("mask").addEventListener("click", closeDrawer);
+
+function renderGrid() {
+  const grid = $("grid");
+  grid.innerHTML = "";
+  dramaList.forEach((item, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "ep";
+    b.setAttribute("aria-current", String(i === idx));
+    b.innerHTML = "第 " + item.episode + " 集<small>" + (item.likes || "") + "</small>";
+    b.addEventListener("click", () => { loadEpisode(i); closeDrawer(); });
+    grid.appendChild(b);
+  });
+}
+
+function nextEp() { loadEpisode(idx + 1, { keepMuted: true }); }
+function prevEp() { loadEpisode(idx - 1, { keepMuted: true }); }
+
+/* ---------- 手势：上下滑切集，点按暂停 ---------- */
+let startY = 0, startX = 0, startT = 0, moved = false;
+const app = $("app");
+
+app.addEventListener("touchstart", (e) => {
+  if (drawerOpen) return;
+  const t = e.touches[0];
+  startY = t.clientY; startX = t.clientX; startT = Date.now(); moved = false;
+}, { passive: true });
+
+app.addEventListener("touchmove", (e) => {
+  const t = e.touches[0];
+  if (Math.abs(t.clientY - startY) > 10) moved = true;
+}, { passive: true });
+
+app.addEventListener("touchend", (e) => {
+  if (drawerOpen) return;
+  const t = e.changedTouches[0];
+  const dy = startY - t.clientY;
+  const dx = Math.abs(t.clientX - startX);
+  const dt = Date.now() - startT;
+  if (Math.abs(dy) > 60 && dx < 80) { dy > 0 ? nextEp() : prevEp(); return; }
+  if (!moved && dt < 250) { player.paused ? playSafely() : player.pause(); }
+}, { passive: true });
+
+/* 桌面浏览器点击画面也能暂停；双击全屏 */
+app.addEventListener("click", (e) => {
+  if (e.target.closest("button")) return;
+  player.paused ? playSafely() : player.pause();
+});
+app.addEventListener("dblclick", () => {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else app.requestFullscreen && app.requestFullscreen().catch(() => {});
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); nextEp(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); prevEp(); }
+  else if (e.key === " ") { e.preventDefault(); player.paused ? playSafely() : player.pause(); }
+  else if (e.key === "Escape" && drawerOpen) closeDrawer();
+});
+
+/* 首次提示，3 秒后收起 */
+setTimeout(() => hint.classList.add("show"), 800);
+setTimeout(() => hint.classList.remove("show"), 3800);
+
+/* ---------- 启动 ---------- */
+$("tag").textContent = "🔥 剧场 · 共 " + dramaList.length + " 集";
+loadEpisode(Number(store.get("lastEpisode", 0)) || 0);
+
+/* 离开页面记住进度 */
+window.addEventListener("pagehide", () => {
+  store.set("lastEpisode", idx);
+});
+
+/* ---------- PWA：注册 Service Worker（file:// 下自动跳过） ---------- */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
+
+
+

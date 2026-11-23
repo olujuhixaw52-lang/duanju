@@ -1,0 +1,3 @@
+# 绑定自定义域名：本文件改名为 CNAME，内容只写一行域名，例如
+# drama.example.com
+# 之后在 Settings → Pages → Custom domain 填同一域名，等证书签发。

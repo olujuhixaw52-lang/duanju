@@ -123,6 +123,17 @@ def main():
         if "maximum-scale=1" in html and "user-scalable=no" in html:
             warn("禁止了缩放，视力不佳的用户无法放大文字（可接受但要知道）")
 
+    # 片源授权：进公开仓库的素材必须能说明来源，否则等于对外分发
+    vdir = os.path.join(root, "videos")
+    if os.path.isdir(vdir):
+        media = sorted(f for f in os.listdir(vdir) if f.lower().endswith((".mp4", ".webm", ".m4v")))
+        if media:
+            lic = os.path.join(vdir, "LICENSES.md")
+            if not os.path.exists(lic):
+                warn(f"videos/ 有 {len(media)} 个片源但没有 LICENSES.md：Pages 是公开可下载的，等于对外分发")
+            elif "待填" in io.open(lic, encoding="utf-8").read():
+                warn("videos/LICENSES.md 还有「待填」项：对外宣传/投放前先补齐来源与授权")
+
     # sw.js 基本检查
     spath = os.path.join(root, "sw.js")
     if os.path.exists(spath):

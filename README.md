@@ -4,7 +4,7 @@
 
 ## 在线体验
 
-https://<你的用户名>.github.io/短剧/
+https://<你的用户名>.github.io/duanju/
 
 ## 安装到手机桌面
 

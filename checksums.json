@@ -17,7 +17,7 @@
   },
   "README.md": {
     "bytes": 1187,
-    "sha256": "ea5401cb3b23dd4165040435d6c73ef4e8239f834a3480caeb8d86d2ceaa716e"
+    "sha256": "62c2e3367bb9ca69c6709ca7306358a0c8295b0a08a5cf40b5caac3ae76ff67e"
   },
   "icons/icon-180.png": {
     "bytes": 25680,
@@ -48,8 +48,8 @@
     "sha256": "bc09096f122e35fedd9d6b7abe8cabe11cdc0880e3d4d91ef232306e150020c2"
   },
   "scripts/check_pwa.py": {
-    "bytes": 5801,
-    "sha256": "6b530da8b2fd18872e457d1bfe034538faa4bbf2bbca65cd2aaceafb578c1340"
+    "bytes": 6489,
+    "sha256": "6c46b5c1a04f1f38fe035c58f96141889c67c4a875565083f93471cff8929969"
   },
   "sw.js": {
     "bytes": 1943,
@@ -62,5 +62,9 @@
   "videos/02.mp4": {
     "bytes": 6063623,
     "sha256": "2db632621aeea19e84f0412eb6d7101edb7b1f73dc4176043320c0ba5e125568"
+  },
+  "videos/LICENSES.md": {
+    "bytes": 759,
+    "sha256": "d410e1c74c703529917d91064ab645923c532a941343978f26117b139b099261"
   }
 }

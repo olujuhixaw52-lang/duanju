@@ -16,8 +16,8 @@
     "sha256": "1aeee23212fe10a95e829703fd0fe32223ee74cd6bae7c3af22a96f367fe483c"
   },
   "README.md": {
-    "bytes": 1197,
-    "sha256": "0e22383bda9b5547aaca2f993ac6fb6abc89d7f62d2d2418f38ac08e2d601adf"
+    "bytes": 1187,
+    "sha256": "ea5401cb3b23dd4165040435d6c73ef4e8239f834a3480caeb8d86d2ceaa716e"
   },
   "icons/icon-180.png": {
     "bytes": 25680,
@@ -40,8 +40,8 @@
     "sha256": "33d55f7bf357ee30dbde1afd1292e179fae67711a42710b826c5feab0db3e9c4"
   },
   "index.html": {
-    "bytes": 19363,
-    "sha256": "c3a10aafb67403e98ca03083e433497f890b6b9569b87c0a5fe47c368c761ab8"
+    "bytes": 18758,
+    "sha256": "7e9121d491ecc2c9eb526bcb213ae509034ef58aefbb36f5d70a73bb81e6c6e5"
   },
   "manifest.json": {
     "bytes": 822,
@@ -62,17 +62,5 @@
   "videos/02.mp4": {
     "bytes": 6063623,
     "sha256": "2db632621aeea19e84f0412eb6d7101edb7b1f73dc4176043320c0ba5e125568"
-  },
-  "videos/03.mp4": {
-    "bytes": 5293789,
-    "sha256": "b5d54e9568a36d23eeca5e492fccc0cf7ba007d9eb2983107685bac99c2a047a"
-  },
-  "videos/04.mp4": {
-    "bytes": 5657837,
-    "sha256": "02a7edbf42ea55da52fbcbfbbc56c8eb4bbbe2f1978f31412c2302e51dd4953b"
-  },
-  "videos/05.mp4": {
-    "bytes": 6148602,
-    "sha256": "d64a78a117dd9e37302475470a193bb14e2d444f1ee6311d70b1e66b5c6f2d84"
   }
 }

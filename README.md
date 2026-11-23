@@ -4,7 +4,7 @@
 
 ## 在线体验
 
-https://<你的用户名>.github.io/mini-short-drama/
+https://<你的用户名>.github.io/短剧/
 
 ## 安装到手机桌面
 

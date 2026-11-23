@@ -35,6 +35,12 @@ video#player{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;b
   background:rgba(255,255,255,.16);backdrop-filter:blur(10px);color:var(--text);font-size:14px;font-weight:600;cursor:pointer}
 .speed:active{background:rgba(255,255,255,.26)}
 .speed:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 剧库入口：只有本机剧库服务可达时才显示，公开 Pages 上自动隐藏 */
+.lib{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 14px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.10);color:var(--text);font-size:13px;
+  font-weight:600;text-decoration:none;backdrop-filter:blur(10px)}
+.lib:active{background:rgba(255,255,255,.22)}
+.lib[hidden]{display:none}
 
 /* 右侧操作栏：避开平台 UI，贴右下 */
 .side{position:absolute;right:16px;bottom:calc(190px + var(--safe-bottom));z-index:10;display:flex;flex-direction:column;gap:18px;align-items:center;width:56px}
@@ -104,6 +110,7 @@ video#player{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;b
 
   <div class="top-bar">
     <span class="tag" id="tag">🔥 剧场</span>
+    <a class="lib" id="libLink" href="library.html" hidden>剧库</a>
     <button class="speed" id="speedBtn" type="button" aria-label="切换播放速度">1.0x 倍速</button>
   </div>
 
@@ -406,6 +413,18 @@ setTimeout(() => hint.classList.remove("show"), 3800);
 /* ---------- 启动 ---------- */
 $("tag").textContent = "🔥 剧场 · 共 " + dramaList.length + " 集";
 loadEpisode(Number(store.get("lastEpisode", 0)) || 0);
+
+/* 剧库入口：探一次同源代理，能连上本机剧库服务才显示；公开托管时静默隐藏 */
+fetch("/qj/api/info", { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined })
+  .then(r => r.ok ? r.json() : null)
+  .then(info => {
+    if (!info) return;
+    const a = $("libLink");
+    a.hidden = false;
+    a.textContent = "剧库 · " + (info.name || "本地");
+    a.title = (info.name || "") + " " + (info.version || "");
+  })
+  .catch(() => { });
 
 /* 离开页面记住进度 */
 window.addEventListener("pagehide", () => {

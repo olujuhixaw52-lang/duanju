@@ -142,6 +142,18 @@ def main():
             err("sw.js 没有 install 事件，无法预缓存外壳")
         if "(mp4|webm" not in sw:
             warn("sw.js 没有放行视频扩展名，Range 请求可能被接管")
+        # 预缓存清单里的每个文件都得真的存在，否则安装时会 404
+        m = re.search(r"SHELL_FILES\s*=\s*\[(.*?)\]", sw, re.S)
+        if not m:
+            err("sw.js 里没找到 SHELL_FILES 清单")
+        else:
+            listed = re.findall(r'"(\./[^"]*)"', m.group(1))
+            for item in listed:
+                rel = item[2:]
+                if rel and not os.path.exists(os.path.join(root, rel)):
+                    if rel == "" or rel.endswith("/"):
+                        continue
+                    err(f"sw.js 预缓存的文件不存在：{item}")
 
     # 前端 v2（一起发布）：页面、清单、封面、片库数据
     v2 = os.path.join(root, "player-v2.html")

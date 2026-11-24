@@ -84,12 +84,12 @@
     "sha256": "0e014dc65a3c494477bc561949fde4563e9767453c054b26110d75021a220d95"
   },
   "scripts/check_pwa.py": {
-    "bytes": 8815,
-    "sha256": "2d297e873a645ee39c08f422fff3d4cbb49712bc0b6c39eb25bdc1467ec70a3c"
+    "bytes": 9410,
+    "sha256": "9df627f809aa0f564d445aa201871493bd2ee0f7031c8bfbd5fe159f2fe73ee7"
   },
   "sw.js": {
-    "bytes": 1943,
-    "sha256": "d672357a810bda87d4a4cc2384754d641adb5bdb0e9dca03c46cf09380359d6a"
+    "bytes": 2839,
+    "sha256": "fca35d5f3ff9dd8f912a233962b1e900b7a97896495f030138b620f9fc4e3d34"
   },
   "v2-manifest.json": {
     "bytes": 881,

@@ -143,6 +143,55 @@ def main():
         if "(mp4|webm" not in sw:
             warn("sw.js 没有放行视频扩展名，Range 请求可能被接管")
 
+    # 前端 v2（一起发布）：页面、清单、封面、片库数据
+    v2 = os.path.join(root, "player-v2.html")
+    if not os.path.exists(v2):
+        warn("没有 player-v2.html（新版播放器未随包发布）")
+    else:
+        html2 = io.open(v2, encoding="utf-8").read()
+        if 'rel="manifest"' not in html2:
+            err("player-v2.html 缺 manifest 链接")
+        for rel in re.findall(r'(?:src|href)="([^"]+)"', html2):
+            if rel.startswith(("http://", "https://", "data:", "#")):
+                continue
+            if not os.path.exists(os.path.join(root, rel)):
+                err(f"player-v2.html 引用的文件不存在：{rel}")
+        llib = os.path.join(root, "local-library.json")
+        if not os.path.exists(llib):
+            err("缺 local-library.json（v2 播放器没数据源）")
+        else:
+            try:
+                data = json.load(io.open(llib, encoding="utf-8"))
+            except ValueError as e:
+                err(f"local-library.json 不是合法 JSON：{e}")
+                data = {}
+            items = data.get("items", [])
+            if not items:
+                err("local-library.json 里没有 items")
+            for it in items:
+                src = it.get("src", "")
+                if src and not os.path.exists(os.path.join(root, src)):
+                    err(f"v2 片源不存在：{src}")
+                if not it.get("exists"):
+                    warn(f"v2 里有一集标记不存在：{it.get('title')}")
+        for man in ("v2-manifest.json", "library-v2-manifest.json"):
+            p = os.path.join(root, man)
+            if not os.path.exists(p):
+                err(f"缺 {man}")
+                continue
+            try:
+                mm = json.load(io.open(p, encoding="utf-8"))
+            except ValueError as e:
+                err(f"{man} 不是合法 JSON：{e}")
+                continue
+            su = mm.get("start_url", "")
+            target = su.split("?")[0].lstrip("./")
+            if not target or not os.path.exists(os.path.join(root, target)):
+                err(f"{man} 的 start_url 指向不存在的 {su}")
+            for ic in mm.get("icons", []):
+                if not os.path.exists(os.path.join(root, ic["src"])):
+                    err(f"{man} 图标不存在：{ic['src']}")
+
     # 输出
     for w in warns:
         print(f"  warn  {w}")

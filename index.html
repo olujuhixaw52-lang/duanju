@@ -41,6 +41,7 @@ video#player{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;b
   font-weight:600;text-decoration:none;backdrop-filter:blur(10px)}
 .lib:active{background:rgba(255,255,255,.22)}
 .lib[hidden]{display:none}
+.lib.v2{border-color:rgba(255,77,61,.55);color:#FFD9D4}
 
 /* 右侧操作栏：避开平台 UI，贴右下 */
 .side{position:absolute;right:16px;bottom:calc(190px + var(--safe-bottom));z-index:10;display:flex;flex-direction:column;gap:18px;align-items:center;width:56px}
@@ -110,6 +111,7 @@ video#player{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;b
 
   <div class="top-bar">
     <span class="tag" id="tag">🔥 剧场</span>
+    <a class="lib v2" id="v2Link" href="player-v2.html">新版</a>
     <button class="speed" id="speedBtn" type="button" aria-label="切换播放速度">1.0x 倍速</button>
   </div>
 

@@ -1,0 +1,22 @@
+{
+  "name": "创世录片库",
+  "short_name": "片库",
+  "description": "本机成片与剧源目录：本地一组必定可播，站源目录只标能力边界。",
+  "id": "./library-v2.html",
+  "start_url": "./library-v2.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0B0C",
+  "theme_color": "#0B0B0C",
+  "lang": "zh-CN",
+  "categories": ["entertainment", "video"],
+  "icons": [
+    { "src": "icons-lib/lib-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons-lib/lib-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons-lib/lib-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "播放器", "url": "./player-v2.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

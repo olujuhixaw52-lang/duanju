@@ -1,0 +1,34 @@
+{
+  "_note": "由 tools/build_drama_pages.py 生成，勿手改",
+  "_source": "deploy 内 videos/",
+  "title": "创世录 · 本地成片",
+  "desc": "本机成片，不依赖任何站源。",
+  "count": 2,
+  "total_bytes": 12564776,
+  "items": [
+    {
+      "id": "local:1",
+      "episode": 1,
+      "title": "第1集：成片 · 落日海滩与户外电源",
+      "desc": "9:16 竖屏成片，BGM 与旁白已合轨。",
+      "src": "videos/01.mp4",
+      "poster": "posters/e01.jpg",
+      "exists": true,
+      "bytes": 6501153,
+      "kind": "file",
+      "likes": "1.2w"
+    },
+    {
+      "id": "local:2",
+      "episode": 2,
+      "title": "第2集：导演剪辑版 · 带 BGM",
+      "desc": "同一素材的另一种剪法，节奏更慢。",
+      "src": "videos/02.mp4",
+      "poster": "posters/e02.jpg",
+      "exists": true,
+      "bytes": 6063623,
+      "kind": "file",
+      "likes": "8540"
+    }
+  ]
+}

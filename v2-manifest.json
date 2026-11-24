@@ -1,0 +1,22 @@
+{
+  "name": "剧场 · 新版",
+  "short_name": "剧场v2",
+  "description": "重做版竖屏剧场：安全区参考线、布局自检、本地片库直读。",
+  "id": "./player-v2.html",
+  "start_url": "./player-v2.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0B0C",
+  "theme_color": "#0B0B0C",
+  "lang": "zh-CN",
+  "categories": ["entertainment", "video"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "剧库", "url": "./library-v2.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

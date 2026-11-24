@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>剧场 · 创世录</title>
+<meta name="theme-color" content="#0B0B0C">
+<link rel="manifest" href="v2-manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="剧场v2">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+:root{
+  /* 色板：95% 中性色 + 单一 accent，禁紫 */
+  --bg:#0B0B0C; --surface:#141416; --surface-2:#1B1B1E;
+  --fg:#ECECEE; --fg-2:#A6A6AD; --fg-3:#74747C;
+  --accent:#FF4D3D; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  /* 平台 UI 禁区（1080×1920 实测口径） */
+  --safe-top:108; --safe-bottom:320; --safe-right:120;
+  /* 页面容器 */
+  --gutter:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",system-ui,"PingFang SC","Microsoft YaHei",sans-serif;
+     -webkit-font-smoothing:antialiased;overflow:hidden}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;top:-56px;left:16px;z-index:60;background:var(--surface-2);color:var(--fg);
+      padding:12px 16px;border-radius:10px;text-decoration:none;font-size:16px;border:1px solid var(--line-2)}
+.skip:focus{top:12px}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:0;background:#000;overflow:hidden}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;display:block}
+.scrim-top,.scrim-bottom{position:absolute;left:0;right:0;pointer-events:none}
+.scrim-top{top:0;height:34%;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.28) 52%,transparent)}
+.scrim-bottom{bottom:0;height:42%;background:linear-gradient(to top,rgba(0,0,0,.92),rgba(0,0,0,.55) 45%,transparent)}
+
+/* ── 安全区参考线（默认隐藏，点「安全区」开启） ── */
+.safe{position:absolute;inset:0;pointer-events:none;display:none;font-size:13px;line-height:1.5}
+.safe.on{display:block}
+.safe i{position:absolute;border:1px dashed rgba(255,255,255,.42);border-radius:2px}
+.safe .t90{inset:5%}
+.safe .a93{inset:3.5%;border-style:solid;border-color:rgba(255,255,255,.22)}
+.safe .zt,.safe .zb,.safe .zr{background:rgba(255,77,61,.14);border:1px solid rgba(255,77,61,.5)}
+.safe .zt{left:0;right:0;top:0;height:calc(var(--safe-top)/1920*100%)}
+.safe .zb{left:0;right:0;bottom:0;height:calc(var(--safe-bottom)/1920*100%)}
+.safe .zr{top:0;bottom:0;right:0;width:calc(var(--safe-right)/1080*100%)}
+.safe b{position:absolute;color:#fff;background:rgba(0,0,0,.62);padding:2px 6px;border-radius:4px;font-weight:500}
+.safe b.l90{left:5%;bottom:calc(var(--safe-bottom)/1920*100% + 6px);translate:0 0}
+.safe b.lb{top:calc(100% - var(--safe-bottom)/1920*100%);left:0;right:0;text-align:center;border-radius:0;background:rgba(255,77,61,.62)}
+.safe b.lt{top:calc(var(--safe-top)/1920*100% - 22px);left:0;right:0;text-align:center;border-radius:0;background:rgba(255,77,61,.62)}
+
+/* ── 顶栏 ── */
+.top{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;gap:12px;
+     padding:0 var(--gutter);padding-top:env(safe-area-inset-top)}
+.brand{display:flex;align-items:center;gap:8px;min-width:0}
+.mark{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.brand h1{margin:0;font-size:16px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.count{font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.top .grow{flex:1}
+.iconbtn{width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:10px;
+         color:var(--fg);cursor:pointer;transition:transform .16s ease,background .16s ease}
+.iconbtn:hover{background:rgba(255,255,255,.06);transform:translateY(-1px)}
+.iconbtn:active{transform:translateY(1px) scale(.985)}
+.iconbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.iconbtn[aria-pressed="true"]{color:var(--accent)}
+.txtbtn{height:44px;padding:0 16px;border-radius:10px;background:transparent;border:1px solid var(--line-2);
+        color:var(--fg);font:16px/1 inherit;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.txtbtn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.txtbtn:active{transform:translateY(1px) scale(.985)}
+.txtbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ── 底部控制区：整体压在平台禁区带（320px@1920）里，不遮画面中心 ── */
+.bottom{position:absolute;left:0;right:0;bottom:0;padding:0 var(--gutter) calc(8px + env(safe-area-inset-bottom));
+        display:flex;flex-direction:column;gap:8px}
+.ep{display:flex;align-items:baseline;gap:8px;min-width:0}
+.ep h2{margin:0;font-size:20px;line-height:1.3;font-weight:600;letter-spacing:-.01em;
+       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep .no{font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums;flex:none}
+.seekwrap{display:flex;align-items:center;gap:12px}
+.time{font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums;min-width:40px}
+.time.now{color:var(--fg)}
+/* 滑杆：布局占 32px，热区 44px（负 margin 把多出来的高度吃掉） */
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:44px;margin:-6px 0;background:transparent;cursor:pointer}
+input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;
+  background:linear-gradient(to right,var(--accent) var(--p,0%),rgba(255,255,255,.22) var(--p,0%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;
+  margin-top:-5px;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.22)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff}
+.transport{display:flex;align-items:center;gap:8px}
+.transport .grow{flex:1}
+.play{width:48px;height:48px;border-radius:50%;background:var(--accent);border:0;color:#0B0B0C;
+      display:grid;place-items:center;cursor:pointer;transition:transform .16s ease,filter .16s ease}
+.play:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.play:active{transform:translateY(1px) scale(.985)}
+.play:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ── 选集面板（手动打开，不自动轮播） ── */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line-2);
+       border-radius:16px 16px 0 0;padding:16px var(--gutter) calc(16px + env(safe-area-inset-bottom));
+       transform:translateY(100%);transition:transform .22s cubic-bezier(.22,.8,.28,1);z-index:40}
+.sheet.open{transform:translateY(0)}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet .hd h3{margin:0;font-size:16px;font-weight:600}
+.sheet .hd span{font-size:13px;color:var(--fg-2);white-space:nowrap}
+.eps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:44vh;overflow:auto}
+.eps button{min-height:44px;text-align:left;padding:8px 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--fg);font:13px/1.4 inherit;cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease}
+.eps button:hover{transform:translateY(-1px);border-color:var(--line-2)}
+.eps button:active{transform:translateY(1px) scale(.985)}
+.eps button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eps button[aria-current="true"]{border-color:var(--accent);color:#fff}
+.eps button b{display:block;font-weight:600;font-size:13px;color:var(--fg-2);margin-bottom:2px}
+.sheet .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:-1;opacity:0;transition:opacity .22s ease}
+.sheet.open .mask{opacity:1}
+
+/* ── 自检面板（?audit=1） ── */
+.audit{position:absolute;top:64px;left:var(--gutter);right:var(--gutter);z-index:50;background:rgba(20,20,22,.94);
+       border:1px solid var(--line-2);border-radius:12px;padding:12px;font-size:13px;line-height:1.6;display:none}
+.audit.on{display:block}
+.audit .r{display:flex;gap:8px}
+.audit .ok{color:#8FD6A2}
+.audit .no{color:var(--accent)}
+
+/* 入场：仅一次，只动 opacity/transform；reduced-motion 全静止 */
+@media (prefers-reduced-motion: no-preference){
+  .bottom,.top{animation:rise .34s cubic-bezier(.22,.8,.28,1) both}
+  .bottom{animation-delay:.06s}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#sheetBtn">跳到选集面板</a>
+
+<main class="stage">
+  <video id="v" playsinline preload="metadata" aria-label="剧集画面"></video>
+  <div class="scrim-top" aria-hidden="true"></div>
+  <div class="scrim-bottom" aria-hidden="true"></div>
+
+  <div class="safe" id="safe" aria-hidden="true">
+    <i class="a93"></i><i class="t90"></i>
+    <i class="zt"></i><i class="zb"></i><i class="zr"></i>
+    <b class="lt">顶部状态条 108px</b>
+    <b class="lb">底部字幕 / CTA 320px</b>
+    <b class="l90">title-safe 90%</b>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <h1>剧场</h1>
+      <span class="count" id="count">读取中</span>
+    </div>
+    <div class="grow"></div>
+    <button class="txtbtn" id="safeBtn" aria-pressed="false">安全区</button>
+    <a class="iconbtn" href="library-v2.html" aria-label="打开剧库" title="剧库">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="6" height="6" rx="1.4" stroke="currentColor"/>
+        <rect x="11.5" y="2.5" width="6" height="6" rx="1.4" stroke="currentColor"/>
+        <rect x="2.5" y="11.5" width="6" height="6" rx="1.4" stroke="currentColor"/>
+        <rect x="11.5" y="11.5" width="6" height="6" rx="1.4" stroke="currentColor"/>
+      </svg>
+    </a>
+  </header>
+
+  <section class="bottom" aria-label="播放控制">
+    <div class="ep">
+      <h2 id="epTitle">正在载入…</h2>
+      <span class="no" id="epNo">1/6</span>
+    </div>
+    <div class="seekwrap">
+      <span class="time now" id="tcNow">0:00</span>
+      <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="播放进度" aria-valuetext="0:00">
+      <span class="time" id="tcAll">0:00</span>
+    </div>
+    <div class="transport">
+      <button class="iconbtn" id="prev" aria-label="上一集">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 4h2v12H5zM16 4v12l-8-6z"/></svg>
+      </button>
+      <div class="grow"></div>
+      <button class="play" id="play" aria-label="播放">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6 4l10 6-10 6z"/></svg>
+      </button>
+      <div class="grow"></div>
+      <button class="iconbtn" id="next" aria-label="下一集">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M13 4h2v12h-2zM4 4v12l8-6z"/></svg>
+      </button>
+      <button class="iconbtn" id="sheetBtn" aria-label="选集" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M3 6h11M3 10h11M3 14h7"/><path d="M16 13.5l2.2 1.6-2.2 1.6z" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="mask" id="mask" aria-hidden="true"></div>
+    <div class="hd"><h3 id="sheetTitle">选集</h3><span id="sheetCount"></span></div>
+    <div class="eps" id="eps"></div>
+  </div>
+
+  <div class="audit" id="audit" aria-live="polite"></div>
+  <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const v = $("#v");
+let list = [], idx = 0, ready = false;
+
+const fmt = (t) => {
+  if (!isFinite(t) || t < 0) t = 0;
+  const m = Math.floor(t / 60), s = Math.floor(t % 60);
+  return m + ":" + String(s).padStart(2, "0");
+};
+const say = (t) => { $("#live").textContent = t; };
+const escHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* 数据：web/drama/local-library.json（由 tools/sync_local_library.py 从 index.html 的 dramaList 生成） */
+async function load() {
+  try {
+    const j = await (await fetch("local-library.json", { cache: "no-cache" })).json();
+    list = (j.items || []).filter(x => x.exists);
+    if (!list.length) throw new Error("本机片库为空");
+  } catch (e) {
+    $("#epTitle").textContent = "载入失败";
+    $("#epNo").textContent = "";
+    $("#live").textContent = "本机片库为空，先跑 python tools/sync_local_library.py 生成 local-library.json";
+    const box = $("#audit");
+    box.classList.add("on");
+    box.innerHTML = `<div style="font-weight:600;margin-bottom:6px">载入失败</div>` +
+      `<div class="hint">先跑 <code>python tools\\sync_local_library.py</code> 生成 local-library.json，再刷新。</div>`;
+    $("#count").textContent = "";
+    return;
+  }
+  ready = true;
+  $("#count").textContent = "共 " + list.length + " 集";
+  const q = Number(new URLSearchParams(location.search).get("play"));
+  show(q > 0 ? Math.min(q - 1, list.length - 1) : 0, false);
+  $("#sheetCount").textContent = list.length + " 集 · 本机";
+  renderEps();
+}
+
+function show(i, autoplay = true) {
+  if (!ready) return;
+  idx = (i + list.length) % list.length;
+  const it = list[idx];
+  $("#epTitle").textContent = it.title.replace(/^第\d+集[：:]?\s*/, "");
+  $("#epNo").textContent = (idx + 1) + "/" + list.length;
+  $("#epTitle").setAttribute("title", it.title + (it.desc ? " · " + it.desc : ""));
+  v.src = it.src;
+  v.poster = it.poster ? it.poster : "";
+  $("#seek").value = 0;
+  $("#seek").style.setProperty("--p", "0%");
+  $("#tcNow").textContent = "0:00"; $("#tcAll").textContent = "0:00";
+  markEps();
+  if (autoplay) v.play().catch(() => setPlayIcon(false));
+  setPlayIcon(false);
+}
+function setPlayIcon(on) {
+  $("#play").setAttribute("aria-label", on ? "暂停" : "播放");
+  $("#play").innerHTML = on
+    ? '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6 4h3v12H6zM11 4h3v12h-3z"/></svg>'
+    : '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6 4l10 6-10 6z"/></svg>';
+}
+function renderEps() {
+  $("#eps").innerHTML = list.map((it, i) => {
+    const short = it.title.replace(/^第\d+集[：:]\s*/, "");
+    return `<button type="button" data-i="${i}" aria-current="${i === idx}"><b>第 ${it.episode} 集</b>${escHtml(short)}</button>`;
+  }).join("");
+  $("#eps").querySelectorAll("button").forEach(b => {
+    b.onclick = () => { show(Number(b.dataset.i)); closeSheet(); };
+  });
+}
+function markEps() {
+  $("#eps").querySelectorAll("button").forEach(b => b.setAttribute("aria-current", String(Number(b.dataset.i) === idx)));
+}
+function openSheet() {
+  $("#sheet").classList.add("open"); $("#sheet").setAttribute("aria-hidden", "false");
+  $("#sheetBtn").setAttribute("aria-expanded", "true");
+  $("#eps").querySelector('button[aria-current="true"]')?.focus();
+}
+function closeSheet() {
+  $("#sheet").classList.remove("open"); $("#sheet").setAttribute("aria-hidden", "true");
+  $("#sheetBtn").setAttribute("aria-expanded", "false");
+  $("#sheetBtn").focus();
+}
+/* 播放状态 */
+$("#play").onclick = () => { if (v.paused) v.play().catch(() => {}); else v.pause(); };
+v.addEventListener("play", () => setPlayIcon(true));
+v.addEventListener("pause", () => setPlayIcon(false));
+$("#prev").onclick = () => show(idx - 1);
+$("#next").onclick = () => show(idx + 1);
+$("#sheetBtn").onclick = () => ($("#sheet").classList.contains("open") ? closeSheet() : openSheet());
+$("#mask").onclick = closeSheet;
+
+v.addEventListener("loadedmetadata", () => { $("#tcAll").textContent = fmt(v.duration); });
+v.addEventListener("timeupdate", () => {
+  const d = v.duration || 0;
+  const p = d ? (v.currentTime / d * 1000) : 0;
+  $("#seek").value = p;
+  $("#seek").style.setProperty("--p", (p / 10) + "%");
+  $("#tcNow").textContent = fmt(v.currentTime);
+  $("#seek").setAttribute("aria-valuetext", fmt(v.currentTime) + " / " + fmt(d));
+});
+v.addEventListener("ended", () => { if (idx < list.length - 1) show(idx + 1); });
+$("#seek").oninput = () => {
+  const d = v.duration || 0;
+  if (!d) return;
+  v.currentTime = Number($("#seek").value) / 1000 * d;
+};
+
+/* 键盘：空格播放/暂停，←/→ 快退快进，↑/↓ 上下集 */
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" && e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+  const k = e.key;
+  if (k === " " || k === "Spacebar") { e.preventDefault(); $("#play").click(); }
+  else if (k === "ArrowLeft") { e.preventDefault(); v.currentTime = Math.max(0, v.currentTime - 5); }
+  else if (k === "ArrowRight") { e.preventDefault(); v.currentTime = Math.min(v.duration || 0, v.currentTime + 5); }
+  else if (k === "ArrowUp") { e.preventDefault(); show(idx - 1); }
+  else if (k === "ArrowDown") { e.preventDefault(); show(idx + 1); }
+  else if (k === "Escape") { if ($("#sheet").classList.contains("open")) closeSheet(); }
+});
+
+/* 安全区参考线开关 */
+const params = new URLSearchParams(location.search);
+function toggleSafe(on) {
+  $("#safe").classList.toggle("on", on);
+  $("#safeBtn").setAttribute("aria-pressed", String(on));
+  say(on ? "安全区参考线已开启" : "安全区参考线已关闭");
+}
+$("#safeBtn").onclick = () => toggleSafe(!$("#safe").classList.contains("on"));
+if (params.get("safe") === "1") toggleSafe(true);
+
+/* 自检：?audit=1 —— 用真实布局量一遍，而不是靠肉眼看 */
+function audit() {
+  const H = window.innerHeight, W = window.innerWidth;
+  const sY = H / 1920, sX = W / 1080;
+  const r = (el) => el.getBoundingClientRect();
+  const rows = [];
+  const chk = (name, pass, got) => rows.push(`<div class="r"><span class="${pass ? "ok" : "no"}">${pass ? "PASS" : "FAIL"}</span><span>${name} · ${got}</span></div>`);
+
+  const t = r($("#epTitle"));
+  chk("标题在下验 90% 安全区内", t.top >= H * 0.05 && t.bottom <= H * 0.95, `top ${Math.round(t.top)} / bottom ${Math.round(t.bottom)}`);
+  const tb = r($(".top"));
+  chk("顶栏高度 ≤ 平台顶部禁区 108px", tb.height <= 108 * sY + 1, `${Math.round(tb.height)}px（上限 ${Math.round(108 * sY)}px）`);
+  const bo = r($(".bottom"));
+  chk("底部控制区高度 ≤ 禁区 320px", bo.height <= 320 * sY + 1, `${Math.round(bo.height)}px（上限 ${Math.round(320 * sY)}px）`);
+  chk("底部控制区完全落在禁区带内", bo.top >= H - 320 * sY - 1, `top ${Math.round(bo.top)} / 带起点 ${Math.round(H - 320 * sY)}`);
+  const pl = r($("#play"));
+  chk("播放按钮触控目标 ≥44px", pl.width >= 44 && pl.height >= 44, `${Math.round(pl.width)}×${Math.round(pl.height)}`);
+  const fs = parseFloat(getComputedStyle($("#epTitle")).fontSize);
+  chk("标题字号 ≥16px", fs >= 16, fs + "px");
+  const fs2 = parseFloat(getComputedStyle($("#epNo")).fontSize);
+  chk("次要文字 ≥13px", fs2 >= 13, fs2 + "px");
+  const focusable = document.querySelectorAll("button,a[href],input").length;
+  chk("可聚焦控件数", focusable >= 6, focusable + " 个");
+
+  const box = $("#audit");
+  const pass = rows.every(x => !x.includes('class="no"'));
+  box.classList.add("on");
+  box.innerHTML = `<div style="font-weight:600;margin-bottom:8px">布局自检 · ${pass ? "全部通过" : "有问题"} · ${W}×${H}</div>` + rows.join("");
+}
+audit && params.get("audit") === "1" && setTimeout(audit, 400);
+params.get("sheet") === "1" && setTimeout(openSheet, 500);
+
+load();
+
+/* 离线外壳：注册共用的 sw.js（它不做预缓存清单之外的事，v2 页面首次访问后自动进缓存） */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>

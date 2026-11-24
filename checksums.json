@@ -3,6 +3,10 @@
     "bytes": 320,
     "sha256": "0fc4e6bf9e57f9d3214730c59108a046f2089a66d805ef784227e694a7187f25"
   },
+  ".gitignore": {
+    "bytes": 44,
+    "sha256": "17eb02d44e28d6d4f1e7831b612dafbbe7b01367214ac60dd4f7d132b4036975"
+  },
   ".nojekyll": {
     "bytes": 0,
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -18,6 +22,22 @@
   "README.md": {
     "bytes": 1187,
     "sha256": "62c2e3367bb9ca69c6709ca7306358a0c8295b0a08a5cf40b5caac3ae76ff67e"
+  },
+  "icons-lib/lib-180.png": {
+    "bytes": 26088,
+    "sha256": "7459944454d55627e8672135493d25e9ab130ba1f4f441fead7589ac3eb303d5"
+  },
+  "icons-lib/lib-192.png": {
+    "bytes": 29603,
+    "sha256": "31245a7ec146eb21e0ef7dfc2b5d91999d5d2202e5697f0ab2c2496e9e81ac38"
+  },
+  "icons-lib/lib-512-maskable.png": {
+    "bytes": 117118,
+    "sha256": "d2cd7d3605c423811e50d3b073b8f6e29901b2c11d60cd66d08b7f7e6242b40c"
+  },
+  "icons-lib/lib-512.png": {
+    "bytes": 191030,
+    "sha256": "c92c7d51e5f23fa7c1c0d286b0a01d8da1b67cfef7f9f85fb4e2275f0262f111"
   },
   "icons/icon-180.png": {
     "bytes": 25680,
@@ -40,20 +60,48 @@
     "sha256": "33d55f7bf357ee30dbde1afd1292e179fae67711a42710b826c5feab0db3e9c4"
   },
   "index.html": {
-    "bytes": 19193,
-    "sha256": "a2c3eb12f978ec80b2b7a8333bd8cfa659919074ab271b664d55d5f3f3c59085"
+    "bytes": 19316,
+    "sha256": "ad2ff374faad5c8898ab1cf9478d2cd9fdcd7cae7d747cdee4471634f2dc6a57"
+  },
+  "library-v2-manifest.json": {
+    "bytes": 900,
+    "sha256": "d3a9c6c840fff07854a838e37038aa4f48f3375bc2beecd997a0462420ccb095"
+  },
+  "library-v2.html": {
+    "bytes": 26042,
+    "sha256": "81101b95acee8fc45f5e873f75daaec4f1cc56f4cf62eff92f7bb66280ce8327"
+  },
+  "local-library.json": {
+    "bytes": 925,
+    "sha256": "fe9628f8e9ba22bbc182cf55645b726445d474a2960b81b47e1b75322224c8ea"
   },
   "manifest.json": {
     "bytes": 822,
     "sha256": "bc09096f122e35fedd9d6b7abe8cabe11cdc0880e3d4d91ef232306e150020c2"
   },
+  "player-v2.html": {
+    "bytes": 21011,
+    "sha256": "e583da523349131b562c8da57281c1ea049582dc625c4c95da4f8de9ad7f180a"
+  },
+  "posters/e01.jpg": {
+    "bytes": 29240,
+    "sha256": "8ce86b1ecb251f2e05b433de3850d96a5be2259b3db5917dd46835fe31e0704b"
+  },
+  "posters/e02.jpg": {
+    "bytes": 33686,
+    "sha256": "0e014dc65a3c494477bc561949fde4563e9767453c054b26110d75021a220d95"
+  },
   "scripts/check_pwa.py": {
-    "bytes": 6489,
-    "sha256": "6c46b5c1a04f1f38fe035c58f96141889c67c4a875565083f93471cff8929969"
+    "bytes": 8815,
+    "sha256": "2d297e873a645ee39c08f422fff3d4cbb49712bc0b6c39eb25bdc1467ec70a3c"
   },
   "sw.js": {
     "bytes": 1943,
     "sha256": "d672357a810bda87d4a4cc2384754d641adb5bdb0e9dca03c46cf09380359d6a"
+  },
+  "v2-manifest.json": {
+    "bytes": 881,
+    "sha256": "2cf8ce4fc4d617e0269cbf03b5514121ca42f642068e86e7eb97da0444597967"
   },
   "videos/01.mp4": {
     "bytes": 6501153,

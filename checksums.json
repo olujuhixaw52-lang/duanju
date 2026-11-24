@@ -1,12 +1,4 @@
 {
-  ".github/workflows/pwa-check.yml": {
-    "bytes": 320,
-    "sha256": "0fc4e6bf9e57f9d3214730c59108a046f2089a66d805ef784227e694a7187f25"
-  },
-  ".gitignore": {
-    "bytes": 44,
-    "sha256": "17eb02d44e28d6d4f1e7831b612dafbbe7b01367214ac60dd4f7d132b4036975"
-  },
   ".nojekyll": {
     "bytes": 0,
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
